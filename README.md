@@ -32,7 +32,6 @@ ___
 ![live wallpaper](screenshots/wallpaper.png)
 ![terminal](screenshots/kitty.png)
 ![app menu](screenshots/tofi.png)
-![live wallpaper](screenshots/wallpaper.png)
 ![translucent windows](screenshots/firefox.png)
 ![tiling](screenshots/tiling.png)
 ![power menu](screenshots/power.png)
