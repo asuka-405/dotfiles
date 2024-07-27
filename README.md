@@ -1,12 +1,11 @@
 # My Archlinux Hyprland dotfiles
 
-OS: Archlinux
-AUR helper: yay
+OS: Archlinux | AUR helper: yay
 
 > for other distros, in the end
 
 ### Installation:
-> clone repo and run ./install.sh while being in the root of the repo.
+> clone repo and run `bash ./install.sh` while being in the root of the repo.
 
 > you can skip any package, just remember that if you skip git or yay and you dont have them installed, the script will fail
 ```sh
