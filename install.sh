@@ -5,6 +5,7 @@ slashes() {
 }
 
 CURRENT_DIR=$(pwd)
+HOME=/home/$USER
 
 source "$(dirname "$0")/confirm.sh"
 
@@ -13,8 +14,8 @@ sudo pacman -S git
 slashes
 
 if confirm "installing yay, continue? (y/n)" "installing yay" "continuing without yay" "y/n"; then
-	mkdir /home/$USER/.files-repo
-	cd /home/$USER/.files-repo
+	mkdir $HOME/.files-repo
+	cd $HOME/.files-repo
 	git clone https://aur.archlinux.org/yay.git
 	cd yay
 	makepkg -si
@@ -37,6 +38,10 @@ packages=(
     "firefox"
     "slurp"
     "grim"
+    "bluez"
+    "bluez-utils"
+    "blueman"
+    "networkmanager"
 )
 
 # Loop through the array and confirm before installing each package
@@ -55,16 +60,32 @@ done
 
 echo "Package installation process completed."
 
-if confirm "will remove old hyprland, rofi, tofi and kitty configs, continue now?" "copying" "cannot continue without copying\nmanually copy configs from /home/$USER/.files-repo/dotfiles/config if you want to, exiting!!" "y"; then
-	cp -r $CURRENT_DIR/config/* /home/$USER/.config/
+if confirm "will remove old hyprland, rofi, tofi and kitty configs, continue now?" "copying" "cannot continue without copying\nmanually copy configs from $HOME/.files-repo/dotfiles/config if you want to, exiting!!" "y"; then
+	cp -r $CURRENT_DIR/config/* $HOME/.config/
 else
 	exit 1
 fi
 
 slashes
 echo "enabling screenshotting"
-sudo chmod +x /home/$USER/.config/hypr/ss.sh
+sudo chmod +x $HOME/.config/hypr/ss.sh
+slashes
+echo "enabling NetworkManager"
+sudo systemctl enable --now NetworkManager
+slashes
+echo "enabling bluetooth"
+sudo systemctl enable --now bluetooth
 slashes
 
-echo "done, now logout and login into hyprland,\nto start hyprland,\nchose hyprland in your login manager, or\n if in CLI, type 'hyprland' command to start"
+echo "done,
+now logout and login into hyprland,
+to start hyprland:
+    > chose hyprland in your login manager, or
+    > if in CLI, type 'hyprland' command to start
+use:
+    > 'nmtui' to connect to wifi
+    > to connect to bluetooth, bleutooth manager applet in available
+
+check README for more info and keybindings`    
+"
 exit 0
