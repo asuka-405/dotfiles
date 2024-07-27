@@ -41,9 +41,7 @@ install above mentioned packages
 copy contents of `config` directory into `/home/$USER/.config`
 ___
 ##### To Do:
-- add a status bar
 - style power menu
 - power menu getting tiled (issue)
 - p10k theme default integration
-- bluetooth & wifi applets
 
