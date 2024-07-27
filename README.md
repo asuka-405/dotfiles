@@ -36,7 +36,7 @@ ___
 ![power menu](screenshots/power.png)
 ___
 ### Non arch distros:
-install above mentioned packages
+install above mentioned packages and then
 copy contents of `config` directory into `/home/$USER/.config`
 ___
 ##### To Do:
