@@ -6,13 +6,36 @@ slashes() {
 
 CURRENT_DIR=$(pwd)
 HOME=/home/$USER
+SDDM_THEME=
 
 source "$(dirname "$0")/confirm.sh"
 
+slashes
+echo "setting up locale"
+sudo echo "en_IN UTF-8" > /etc/locale.gen
+sudo echo "LANG=en_IN.UTF-8" > /etc/locale.conf
+ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
+hwclock --systohc --localtime
+locale-gen
+
+slashes
+read -p "enter hostname: " hostname
+sudo echo "$hostname" > /etc/hostname
+
+slashes
+echo "setting up ntp for time"
+sudo systemctl enable systemd-timesyncd
+sudo systemctl start systemd-timesyncd
+sudo timedatectl set-ntp true
+echo "copying ntp server info to /etc/systemd/timesyncd.conf"
+sudo cp $CURRENT_DIR/timesyncd.conf /etc/systemd/
+sudo systemctl restart systemd-timesyncd
+
+slashes
 echo "installing git"
 sudo pacman -S git
-slashes
 
+slashes
 if confirm "installing yay, continue? (y/n)" "installing yay" "continuing without yay" "y/n"; then
 	mkdir $HOME/.files-repo
 	cd $HOME/.files-repo
@@ -25,10 +48,12 @@ fi
 
 slashes
 echo "installing packages:"
-slashes
 
+slashes
 packages=(
     "hyprland"
+    "polkit"
+    "gnome-polkit"
     "rofi"
     "rofi-power-menu"
     "tofi"
@@ -42,9 +67,13 @@ packages=(
     "bluez-utils"
     "blueman"
     "networkmanager"
+    "mpv"
+    "mpvpaper"
+    "papirus-icon-theme"
+    "numix-circle-icon-theme-git"
+    "sddm"
 )
 
-# Loop through the array and confirm before installing each package
 for package in "${packages[@]}"; do
     slashes
     if confirm "Do you want to install $package? (y/n)" "Installing $package." "Skipping $package." "y/n"; then
@@ -58,23 +87,55 @@ for package in "${packages[@]}"; do
     fi
 done
 
+slashes
+if confirm "Do you want to install oh-my-zsh? (y/n)" "Installing oh-my-zsh" "Skipping oh-my-zsh" "y/n"; then
+	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+	if [ $? -ne 0 ]; then
+		echo "Failed to install oh-my-zsh"
+	else
+		echo "oh-my-zsh installed successfully."
+		sudo rm -r $HOME/.oh-my-zsh
+		echo "installing powerlevel10k theme for zsh"
+		git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+	fi
+fi
+
+slashes
 echo "Package installation process completed."
 
+slashes
 if confirm "will remove old hyprland, rofi, tofi and kitty configs, continue now?" "copying" "cannot continue without copying\nmanually copy configs from $HOME/.files-repo/dotfiles/config if you want to, exiting!!" "y"; then
 	cp -r $CURRENT_DIR/config/* $HOME/.config/
+	cp $CURRENT_DIR/.zshrc $HOME/
 else
 	exit 1
 fi
 
 slashes
+echo "installing fonts"
+cp -r $CURRENT_DIR/local/* $HOME/.local/
+fc-cache -fv
+
+slashes
 echo "enabling screenshotting"
 sudo chmod +x $HOME/.config/hypr/ss.sh
+
 slashes
 echo "enabling NetworkManager"
-sudo systemctl enable --now NetworkManager
+sudo systemctl enable NetworkManager
+sudo systemctl start NetworkManager
+
 slashes
 echo "enabling bluetooth"
-sudo systemctl enable --now bluetooth
+sudo systemctl enable bluetooth
+sudo systemctl start bluetooth
+
+slashes
+echo "enabling sddm"
+sudo systemctl enable sddm
+sudo systemctl start sddm
+#sudo cp -r $CURRENT_DIR/Sweet /usr/share/sddm/themes
+#sudo cp $CURRENT_DIR/sddm.conf /etc/
 slashes
 
 echo "done,
@@ -86,6 +147,5 @@ use:
     > 'nmtui' to connect to wifi
     > to connect to bluetooth, bleutooth manager applet in available
 
-check README for more info and keybindings`    
-"
+check README for more info and keybindings"
 exit 0
