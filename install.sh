@@ -71,7 +71,9 @@ packages=(
     "mpvpaper"
     "papirus-icon-theme"
     "numix-circle-icon-theme-git"
-    "sddm"
+    "sddm",
+    "timeshift",
+    "github-cli"
 )
 
 for package in "${packages[@]}"; do
@@ -88,16 +90,9 @@ for package in "${packages[@]}"; do
 done
 
 slashes
-if confirm "Do you want to install oh-my-zsh? (y/n)" "Installing oh-my-zsh" "Skipping oh-my-zsh" "y/n"; then
-	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-	if [ $? -ne 0 ]; then
-		echo "Failed to install oh-my-zsh"
-	else
-		echo "oh-my-zsh installed successfully."
-		sudo rm -r $HOME/.oh-my-zsh
-		echo "installing powerlevel10k theme for zsh"
-		git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
-	fi
+if confirm "Do you want to install powerlevel10k theme for zsh? (y/n)" "Installing p10k" "Skipping p10k" "y/n"; then
+	git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+	echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
 fi
 
 slashes
@@ -136,8 +131,12 @@ sudo systemctl enable sddm
 sudo systemctl start sddm
 #sudo cp -r $CURRENT_DIR/Sweet /usr/share/sddm/themes
 #sudo cp $CURRENT_DIR/sddm.conf /etc/
-slashes
 
+slashes
+echo "creating a timeshift snapshot"
+timeshift --create --comments "postinstall"
+
+slashes
 echo "done,
 now logout and login into hyprland,
 to start hyprland:
