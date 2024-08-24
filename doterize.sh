@@ -11,18 +11,6 @@ SDDM_THEME=
 source "$(dirname "$0")/confirm.sh"
 
 slashes
-echo "setting up locale"
-sudo echo "en_IN UTF-8" > /etc/locale.gen
-sudo echo "LANG=en_IN.UTF-8" > /etc/locale.conf
-ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
-hwclock --systohc --localtime
-locale-gen
-
-slashes
-read -p "enter hostname: " hostname
-sudo echo "$hostname" > /etc/hostname
-
-slashes
 echo "setting up ntp for time"
 sudo systemctl enable systemd-timesyncd
 sudo systemctl start systemd-timesyncd
@@ -133,8 +121,9 @@ sudo systemctl start sddm
 #sudo cp $CURRENT_DIR/sddm.conf /etc/
 
 slashes
-echo "creating a timeshift snapshot"
-timeshift --create --comments "postinstall"
+if confirm "create a timeshift snapshot now? (y/n)" "creating a timeshift snapshot" "not creating a timeshift snapshot" "y/n"; then
+    timeshift --create --comments "postinstall"
+fi
 
 slashes
 echo "done,
