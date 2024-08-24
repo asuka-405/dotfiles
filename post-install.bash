@@ -1,7 +1,7 @@
 source "$(dirname "$0")/confirm.sh"
 
 pacman -Sy
-pacmaan -S neovim zsh networkmanager ntfs-3g amd-ucode --noconfirm
+pacman -S neovim zsh networkmanager ntfs-3g amd-ucode --noconfirm
 
 echo "en_IN UTF-8" > /etc/locale.gen
 locale-gen
