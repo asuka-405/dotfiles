@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Colors
+BG_COLOR="#1e1e2e"     # Background: A soft dark gray
+FG_COLOR="#cdd6f4"     # Foreground: Light gray for text
+SEL_BG_COLOR="#89b4fa" # Selected item background: Light blue
+SEL_FG_COLOR="#1e1e2e" # Selected item foreground: Dark gray
+
+# Fonts
+FONT="monospace:size=10"  # Replace with a preferred font, e.g., "Hack:size=10"
+
+# Launch dmenu
+dmenu_run \
+    -fn "$FONT" \
+    -nb "$BG_COLOR" \
+    -nf "$FG_COLOR" \
+    -sb "$SEL_BG_COLOR" \
+    -sf "$SEL_FG_COLOR"

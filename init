@@ -1,0 +1,6 @@
+#!/bin/bash
+
+source script/slashes
+source script/confirm
+source script/link_sys_files
+source script/package_install

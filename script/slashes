@@ -1,0 +1,6 @@
+#!/bin/bash
+
+slashes() {
+    local term_width=$(tput cols)
+    printf '%*s\n' "$term_width" | tr ' ' '/'
+}

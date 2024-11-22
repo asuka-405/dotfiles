@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+RESET='\033[0m'
+
+# Default values
+DEFAULT_CONFIG_DIR="$(dirname "$(realpath "$0")")/nix" # ./nix relative to this script
+DEFAULT_TARGET_DIR="." # Default to the current directory
+
+# Function to display usage
+usage() {
+    echo -e "${CYAN}Usage:${RESET} $0 [-c CONFIG_DIR] [-t TARGET_DIR]"
+    echo -e "  ${YELLOW}-c CONFIG_DIR${RESET}  Directory containing .nix configuration files (default: ./nix)"
+    echo -e "  ${YELLOW}-t TARGET_DIR${RESET}  Target directory for environment creation (default: current directory)"
+    exit 1
+}
+
+# Parse command-line arguments
+while getopts "c:t:" opt; do
+    case $opt in
+        c) CONFIG_DIR="$OPTARG" ;;
+        t) TARGET_DIR="$OPTARG" ;;
+        *) usage ;;
+    esac
+done
+
+# Set defaults if arguments are not provided
+CONFIG_DIR="${CONFIG_DIR:-$DEFAULT_CONFIG_DIR}"
+TARGET_DIR="${TARGET_DIR:-$DEFAULT_TARGET_DIR}"
+
+# Verify that the CONFIG_DIR exists
+if [[ ! -d "$CONFIG_DIR" ]]; then
+    echo -e "${RED}Error:${RESET} Configuration directory '$CONFIG_DIR' does not exist."
+    exit 1
+fi
+
+# Create the target directory if it doesn't exist
+mkdir -p "$TARGET_DIR"
+
+# List available environments
+echo -e "${CYAN}Available environments in $CONFIG_DIR:${RESET}"
+env_found=false
+for nix_file in "$CONFIG_DIR"/*.nix; do
+    [[ -e "$nix_file" ]] || continue # Skip if no .nix files are found
+    env_found=true
+    env_name=$(basename "$nix_file" .nix)
+    description=$(grep -m 1 "^#" "$nix_file" | sed 's/^# //')
+    echo -e "> ${GREEN}$env_name${RESET}"
+    echo -e "  ${YELLOW}Description:${RESET} ${description:-No description available}"
+done
+
+# Check if no environments are available
+if [[ "$env_found" == false ]]; then
+    echo -e "${YELLOW}No environments available.${RESET}"
+    exit 0
+fi
+
+# Prompt for the environment to create
+read -p "Enter the environment name to create: " env_name
+
+# Check if the selected environment exists
+nix_file="$CONFIG_DIR/$env_name.nix"
+if [[ ! -f "$nix_file" ]]; then
+    echo -e "${RED}Error:${RESET} Environment '$env_name' does not exist in $CONFIG_DIR."
+    exit 1
+fi
+
+# Create the environment
+echo -e "${CYAN}Creating environment '${GREEN}$env_name${CYAN}' in '${YELLOW}$TARGET_DIR${CYAN}'...${RESET}"
+nix-shell "$nix_file" --run "echo '${GREEN}Environment $env_name is ready!${RESET}'"
+
+echo -e "${GREEN}Environment '${env_name}' has been created in '${TARGET_DIR}'.${RESET}"
+

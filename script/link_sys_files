@@ -1,0 +1,46 @@
+#!/bin/zsh
+
+# Set the root directory for the system files
+SYSTEM_DIR="../system"
+
+# 1. Link config files to the correct locations within the home directory
+echo "Linking config files..."
+
+# Loop through each directory in the config directory
+for config_dir in "$SYSTEM_DIR/config"/*; do
+  if [ -d "$config_dir" ]; then
+    # Link the entire directory to the $HOME/.config directory
+    ln -sf "$config_dir" "$HOME/.config/$(basename "$config_dir")"
+  elif [ -f "$config_dir" ]; then
+    # If it's a file, link it directly
+    ln -sf "$config_dir" "$HOME/.config/$(basename "$config_dir")"
+  fi
+done
+
+# 2. Link home directory files to the correct locations
+echo "Linking home directory files..."
+
+# Link home directory files
+ln -sf "$SYSTEM_DIR/home/.xinitrc" "$HOME/.xinitrc"
+ln -sf "$SYSTEM_DIR/home/.Xresources" "$HOME/.Xresources"
+
+# 3. Link files and directories from tool directory
+echo "Linking files and directories in tool..."
+
+for tool_dir in "$SYSTEM_DIR/tool"/*; do
+  if [ -d "$tool_dir" ]; then
+    # Loop through each file or directory in the tool subdirectories
+    for tool_file in "$tool_dir"/*; do
+      if [ -d "$tool_file" ]; then
+        # If it's a directory, link the whole directory to $HOME/bin
+        ln -sf "$tool_file" "$HOME/bin/$(basename "$tool_file")"
+      elif [ -f "$tool_file" ]; then
+        # If it's a file, link the file to $HOME/bin
+        ln -sf "$tool_file" "$HOME/bin/$(basename "$tool_file")"
+      fi
+    done
+  fi
+done
+
+echo "All symlinks created successfully!"
+

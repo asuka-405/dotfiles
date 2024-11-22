@@ -1,3 +1,5 @@
+#!/bin/bash
+
 confirm() {
     local question="$1"
     local yes_answer="$2"

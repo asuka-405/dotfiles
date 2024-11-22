@@ -24,6 +24,11 @@ fi
 # Define the output filename
 OUTPUT_FILE="$DIRECTORY/$BASE_FILENAME$NEXT_NUMBER.$FILE_EXTENSION"
 
-# Take the screenshot
-grim -g "$(slurp)" "$OUTPUT_FILE"
+# Check if DISPLAY environment variable is set (necessary for X11)
+if [ -z "$DISPLAY" ]; then
+    echo "Error: DISPLAY environment variable is not set. Are you running X11?"
+    exit 1
+fi
 
+# Take the screenshot using maim and slurp to select region
+maim -s "$(slurp)" "$OUTPUT_FILE"
